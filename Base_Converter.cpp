@@ -2,24 +2,31 @@
 #include <stdlib.h>
 #include <String.h>
 
-/*void ajusteHexa(char num[10], int aux[10]){
-	for(int i = 0; i < strlen(num)-1; i++){
-		switch(num[i]){
-			case 'A': aux[i] = 10; break;
-			case 'B': aux[i] = 11; break;
-			case 'C': aux[i] = 12; break;
-			case 'D': aux[i] = 13; break;
-			case 'E': aux[i] = 14; break;
-			case 'F': aux[i] = 15; break;
-			default: aux[i] = atoi(num[i]); break; //convertendo para Inteiro e invertendo
+int AjustaHexa(char letra){
+	int num;
+	switch(letra){
+			case 'A': num= 10; break;
+			case 'B': num = 11; break;
+			case 'C': num = 12; break;
+			case 'D': num = 13; break;
+			case 'E': num = 14; break;
+			case 'F': num = 15; break;
+			default:  num = (int)(letra);  //convertendo para Inteiro
 		}
-	}
-	return;
+	return (num);
 }
-*/
-int verify(char num[10], int a){
+
+int *ToInt (char *vet, int len){
+	int *num=(int*)calloc(len, sizeof(int));// aloca um espaço de memoria para o array, explicação sobre a necessidade dele existir no final do prog.
+	for(int i = 0; i < len; i++){
+		*(num+i) = AjustaHexa (*(vet+i));
+	}
+	return (num);
+}
+
+int verify(char num[10], int a){/*Em testes não estva funcionando, Ai do metodo antigo funcionou??*/
 	for(int i = 0; i < strlen(num)-1; i++){
-		if(num[i] > a + 0x30){
+		if(AjustaHexa(num[i]) > a){
 			printf("O numero %s nao pertence a base %d", num, a);
 			return 1;
 		}
@@ -27,22 +34,28 @@ int verify(char num[10], int a){
 	return 0;
 }
 
+
 int main(){
 	int a, b;//a base incial, b base final
-	int i = 0; //contador
-	char num[10];//numero
-	int aux[10];//auxiliar para a inversão
+	int Base_Dez;//armazena o numero em na base dez
+	char num[10];//armazena o numero em vetor na base inicial
+	int *x;//será apgada em versões futuras
 	do{
 		printf("Informe a base do numero:");
-		scanf("%d*C",&a);
+		scanf("%d%*c",&a);
 		printf("Informe o numero:");
-		gets(num); //o programa, por algum motivo, nao esta executando o terceiro scanf
+		gets(num); 
 		printf("\nInforme a base que deseja:");
-		scanf("%d*C",&b);
-	} while(verify(num,a) == 1);
-	/* Para passarmos esse vetor de por parametros precisariamos alocar um espaçõ de memoria e passarmos um vetor
-	para facilitar nossa vida faça a função aki 
-	ps:o numero esta invertido para facilitar qnd for elevar para converter para decimal */
-	
+		scanf("%d%*c",&b);
+	} while(verify(num,a)==1);
+	x=ToInt(num,strlen(num));//converte as strings em inteiros
+	for(int i = 0; i < strlen(num); i++){
+		printf("%d", *(x+i));
+	}
+	free (x);//libera o espaço alocado na na função ajustaHexa
+	getchar();
+	return 0;
 	
 }
+
+// Qnd uma função termina sua execução todos os espações alocados por ela são liberados, então o compilador reclama vc passar um espaço de memoria que deveria ser desalocado, por isso o usa da função calloc
