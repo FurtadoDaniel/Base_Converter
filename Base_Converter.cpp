@@ -1,33 +1,39 @@
 #include <stdio.h>
-#include <String.h>
+#include <stdlib.h>
+#include <string.h> //nao sei se essa biblioteca eh necessaria mesmo, da um confere aí
 
-int main (){
-	int a, b;//a base incial, b base final
-	int i=0; //contador
-	char num[10];//numero
-	int aux[10];//auxiliar para a inversão
-	printf("Informe a base do numero:");
-	scanf("%d*C",&a);
-	printf("Informe o numero:");
-	gets(num);
-	printf("Informe a base que deseja:");
-	scanf("%d*C",&b);
-	while(i<strlen(num)){
-		switch (num[strlen(num)-i-1]){
-			case 'A':aux[i]=10;break;
-			case 'B':aux[i]=11;break;
-			case 'C':aux[i]=12;break;
-			case 'D':aux[i]=13;break;
-			case 'E':aux[i]=14;break;
-			case 'F':aux[i]=15;break;
-			default:aux[i]=atoi(num[strlen(num)-i-1]);//convertendo para Inteiro e invertendobreak;
+int verify (int k, char *n); //recebe a base original e o endereço da primeira posicao do numero
+int toInt (char n); //recebe a primeira posicao do numero
+int adaptHex (char n); //trabalha junto com toInt() para adatar os valores dos numeros hexadecimais, recebendo o valor q deve converter
+int kToTen (int k, int *n); //recebe a base original do numero e a primeira posicao do do vetor gerado com toInt()
+int tenToK (int n, int k); //recebe o numero inteiro gerado com kToTen() e a base para a qual converter o numero
+
+int main(){
+	int b, k, num[], base_ten;
+	char n[128]; //coloquei 128 pq eh o tamanho da maior palavra em binario, mas se quiser mudar o tamanho, pode
+	do{
+		printf ("Informe o numero seguido da base atual e da base desejada, separados por espaço (Ex.: 150 10 2):  ");
+		scanf ("%s %d %d", n, &b, &k);
+	} while (verify (k, n) == 1);
+	if (b == k)
+		printf ("\nResultado: %s", n);
+	else if (b != 10){
+		int i = 0;
+		while (n[i] != '\0'){
+			num[i] = toInt (n[i]);
+			i++;
 		}
-		i++;
+		base_ten = kToTen (k, num);
 	}
-	aux[i]='\0'
-	/* Para passarmos esse vetor de por parametros precisariamos alocar um espaçõ de memoria e passarmos um vetor
-	para facilitar nossa vida faça a função aki 
-	ps:o numero esta invertido para facilitar qnd for elevar para converter para decimal */
-	
-	
+	else {
+		//faça aqui um código q pegue o numero char n, que vai estar na base int b == 10, para um int base_ten de mesmo valor
+	}
+	if (k == 10)
+		printf ("\nResultado %d", base_ten);
+	else {
+		int result[]; //ou char result[];
+		tenToK (base_ten, result);
+		//Insira um codigo para exibir o resultado
+		//O resultado em hexadecial pode ser exibido usando %x, mas eu não sei se vai funcionar, ou transformando o resultado em char novamente.
+	}
 }
