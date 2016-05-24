@@ -1,82 +1,100 @@
-#include <ctype.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> //nao sei se essa biblioteca eh necessaria mesmo, da um confere aí
+#include <stdio.h>	//printf() e scanf()
+#include <stdlib.h>	//atoi()
+#include <string.h> //strlen()
+#include <math.h>	//pow()
 
-int verify (int k, char *n); //recebe a base original e o endereço da primeira posicao do numero
-int toInt (char n); //recebe a primeira posicao do numero
-int adaptHex (char n); //trabalha junto com toInt() para adatar os valores dos numeros hexadecimais, recebendo o valor q deve converter
-int kToTen (int k, int *n); //recebe a base original do numero e a primeira posicao do do vetor gerado com toInt()
-void tenToK (int n, int k); //recebe o numero inteiro gerado com kToTen() e a base para a qual converter o numero
+int Verify (int k, char *n); //Verifica se o numero esta dentro da base
+int BtoInt (char *b, int base); //recebe um vetor de caracteres, a base dele e o converte para um numero na base 10.
+int Conve(char n); //converte o caractere recebido no respectivo inteiro
+int Reconve(int num);//converte o inteiro recebido no respectivo caractere
+void TentoK (int n, int k, char resultado[128]); //recebe o numero inteiro na base 10, a base para a qual converter o numero e o endereço de memoria onde deve montar o numero convertido
 
 int main(){
-	int b, k, num[], base_ten;
-	char n[128]; //coloquei 128 pq eh o tamanho da maior palavra em binario, mas se quiser mudar o tamanho, pode
+	int b, k, num, base_ten;
+	char n[128], result[128]; 
+	
+	//le os dados de entrada indefinidas vezes, ate que o numero esteja na base inicial fornecida
 	do{
-		printf ("Informe o numero seguido da base atual e da base desejada, separados por espaço (Ex.: 150 10 2):  ");
+		printf ("Informe o numero seguido da base atual e da base desejada, separados por espaco (Ex.: 150 10 2):  ");
 		scanf ("%s %d %d", n, &b, &k);
-	} while (verify (k, n) == 1);
-	if (b == k)
+	} while (Verify (b, n) == 1);
+	
+	if (b == k)	//caso a conversao nao faca sentindo
 		printf ("\nResultado: %s", n);
-	else if (b != 10){
-		int i = 0;
-		while (n[i] != '\0'){
-			num[i] = toInt (n[i]);
-			i++;
+	else {
+		if (b != 10) //caso o numero fornecido nao esteja na base 10, ele eh convertido para a mesma e tranformado em um inteiro
+			base_ten = BtoInt(n, b);
+		else {
+			base_ten = atoi(n); //caso esteja na base 10, o numero eh convertido para inteiro diretamente
 		}
-		base_ten = kToTen (k, num, strlen (n));
+		
+		if (k == 10)//caso a base desejada seja a 10, o resultado ja esta pronto
+			printf ("\nResultado %d", base_ten);
+		else {//caso a base desejada nao seja a 10, ele eh convertido
+			TentoK (base_ten, k, result);
+			printf ("\nResultado %s", result);
+		}
 	}
-	else {
-		//faça aqui um código q pegue o numero char n, que vai estar na base int b == 10, para um int base_ten de mesmo valor
-	}
-	if (k == 10)
-		printf ("\nResultado %d", base_ten);
-	else {
-		printf ("Resultado: ");
-		tenToK (int n, int k);
-		//Insira um codigo para exibir o resultado
-		//O resultado em hexadecial pode ser exibido usando %x, mas eu não sei se vai funcionar, ou transformando o resultado em char novamente.
-	}
+	
 	return 0;
 }
 
-int kToTen (int k, int *n, int tam){
-	int num = 0, i;
-	for (i = 0; i < tam; i++, n++)
-		num += *n * pow (k, i);
-	return num;
+int BtoInt (char *num, int base) {
+	int resp = 0, i;
+	// percorre o vetor fazendo o somatorio da segunte formula: numero * base elevado a posicao
+	for (i=0; i < strlen(num); i++) 
+		resp += (Conve(*(num+i)) * pow(base,(strlen(num)-i-1)));
+	return resp;
 }
 
-void tenToK (int n, int k){
-	tenToK (n / k);
-	if (k == 10){
-		switch (n % k){
-			case 10: printf ("a"); break;
-			case 11: printf ("b"); break;
-			case 12: printf ("c"); break;
-			case 13: printf ("d"); break;
-			case 14: printf ("e"); break;
-			case 15: printf ("f"); break;
+int Conve(char letra){
+	int num;
+	switch(letra){
+			case 'A': num= 10; break;
+			case 'B': num = 11; break;
+			case 'C': num = 12; break;
+			case 'D': num = 13; break;
+			case 'E': num = 14; break;
+			case 'F': num = 15; break;
+			default:  num = letra - '0';  //convertendo para Integer
 		}
-	}
-	else
-		printf ("%d", n % k);
+	return (num);
 }
 
-int verify (int k, char *n){
-	char asc;
-	switch (k){
-		case 2: asc = '1'; break;
-		case 5: asc = '4'; break;
-		case 8: asc = '7'; break;
-		case 10: asc = '9'; break;
-		case 16: asc = 'f'; break;
-	}
-	while (*n != '\0'){
-		if (tolower (*n) > asc)
+int Reconve(int num){
+	char letra;
+	switch(num){
+			case 10: letra='A' ; break;
+			case 11: letra ='B' ; break;
+			case 12: letra ='C' ; break;
+			case 13: letra ='D' ; break;
+			case 14: letra ='E' ; break;
+			case 15: letra ='F' ; break;
+			default:  letra = num+'0';  	//convertendo para char
+		}
+	return (letra);
+}
+
+int Verify(int a, char *num){
+	for(int i = 0; i < strlen(num); i++){
+		if(Conve(num[i]) >= a){//utiliza a funcao Conve para converter os caracteres de base acima de 10
+			printf("O numero %s nao pertence a base %d\n", num, a);
 			return 1;
-		*n++;
+		}
 	}
 	return 0;
+}
+
+void TentoK(int n, int k, char *resultado){
+	int invertida[128];
+	int i=0, j;
+	while (n != 0){     //metodo das multiplas divisoes
+		invertida[i] = (n % k);
+		n = (n / k);
+		i++;
+	}
+	resultado[i] = '\0';    //marca o limite do vetor final
+	for (j=0; i>0; j++, i--){    //inverte o vetor que vem ao contrario pelo metodo acima
+		resultado[j] = Reconve(invertida[i-1]);
+	}
 }
